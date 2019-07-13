@@ -14,4 +14,4 @@ lint:
 	npx eslint .
 
 test:
-	sudo npm run test
+	npm run test
