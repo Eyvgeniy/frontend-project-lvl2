@@ -7,18 +7,17 @@ const typeFile = [
   {
     type: 'yaml',
     check: arg => arg === '.yaml',
-    process: file =>
-      yaml.safeLoad(fs.readFileSync(`${__dirname}/${file}`, 'utf8'))
+    process: file => yaml.safeLoad(fs.readFileSync(`${__dirname}/${file}`, 'utf8')),
   },
   {
     type: 'json',
     check: arg => arg === '.json',
-    process: file => JSON.parse(fs.readFileSync(`${__dirname}/${file}`, 'utf8'))
+    process: file => JSON.parse(fs.readFileSync(`${__dirname}/${file}`, 'utf8')),
   },
   {
     type: 'ini',
     check: arg => arg === '.ini',
-    process: file => ini.parse(fs.readFileSync(`${__dirname}/${file}`, 'utf-8'))
+    process: file => ini.parse(fs.readFileSync(`${__dirname}/${file}`, 'utf-8')),
   }
 ];
 export default file => {
