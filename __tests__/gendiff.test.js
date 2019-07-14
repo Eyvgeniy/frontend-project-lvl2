@@ -9,6 +9,14 @@ const result = `{
 + verbose: true
 }`;
 
-test('check diff', () => {
+test('check diff json', () => {
   expect(gendiff('before.json', 'after.json')).toBe(result);
+});
+
+test('check diff yaml', () => {
+  expect(gendiff('before.yaml', 'after.yaml')).toBe(result);
+});
+
+test('check diff ini', () => {
+  expect(gendiff('before.ini', 'after.ini')).toBe(result);
 });

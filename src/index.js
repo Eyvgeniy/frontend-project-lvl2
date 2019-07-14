@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { has, union } from 'lodash';
+import parse from '../src/parsers';
 
 const typeActions = [
   {
@@ -42,9 +43,9 @@ const typeActions = [
 ];
 const getTypeAction = arg => typeActions.find(({ check }) => check(arg));
 
-const gendiff = function(before, after) {
-  const firstFile = JSON.parse(fs.readFileSync(`${__dirname}/${before}`));
-  const secondFile = JSON.parse(fs.readFileSync(`${__dirname}/${after}`));
+const gendiff = function(first, second) {
+  const firstFile = parse(first);
+  const secondFile = parse(second);
   const keys = union(Object.keys(firstFile), Object.keys(secondFile));
   const ast = keys.map(key => {
     if (

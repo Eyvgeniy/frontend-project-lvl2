@@ -18,6 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.20.0",
+    "ini": "^1.3.5",
+    "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
     "readline-sync": "^1.4.9"
   },
