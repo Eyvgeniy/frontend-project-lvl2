@@ -1,8 +1,4 @@
-import {
-  has,
-  union,
-  isObject,
-} from 'lodash';
+import { has, union, isObject } from 'lodash';
 import parse from './parsers';
 import json from './formatters/tree';
 import plain from './formatters/plain';
@@ -11,11 +7,7 @@ import file from './formatters/json';
 const buildAst = (first, second) => {
   const keys = union(Object.keys(first), Object.keys(second));
   const ast = keys.map((key) => {
-    if (
-      has(first, key)
-      && has(second, key)
-      && isObject(first[key]) && isObject(second[key])
-    ) {
+    if (has(first, key) && has(second, key) && isObject(first[key]) && isObject(second[key])) {
       return {
         key,
         oldValue: null,
@@ -24,11 +16,7 @@ const buildAst = (first, second) => {
         children: buildAst(first[key], second[key]),
       };
     }
-    if (
-      has(first, key)
-      && has(second, key)
-      && first[key] === second[key]
-    ) {
+    if (has(first, key) && has(second, key) && first[key] === second[key]) {
       return {
         key,
         oldValue: first[key],
@@ -37,11 +25,7 @@ const buildAst = (first, second) => {
         children: [],
       };
     }
-    if (
-      has(first, key)
-      && has(second, key)
-      && first[key] !== second[key]
-    ) {
+    if (has(first, key) && has(second, key) && first[key] !== second[key]) {
       return {
         key,
         oldValue: first[key],
@@ -78,11 +62,10 @@ const gendiff = (first, second, format) => {
   const ast = buildAst(firstFile, secondFile);
   switch (format) {
     case 'plain':
-      return (plain(ast));
+      return plain(ast);
 
     case 'json':
-      return (json(ast));
-
+      return json(ast);
     case 'file':
       return file(ast);
 

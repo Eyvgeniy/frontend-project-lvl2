@@ -1,21 +1,9 @@
-import {
-  isObject,
-} from 'lodash';
-// Property 'timeout' was updated. From 50 to 20 
-// Property 'proxy' was removed
-// Property 'common.setting4' was removed
-// Property 'common.setting5' was removed
-// Property 'common.setting2' was added with value: 200
-// Property 'common.setting6.ops' was added with value: 'vops'
-// Property 'common.sites' was added with value: 'hexlet.io'
-// Property 'group1.baz' was updated. From 'bars' to 'bas'
-// Property 'group3' was removed
-// Property 'verbose' was added with value: true
-// Property 'group2' was added with value: [complex value]
+import { isObject } from 'lodash';
 
 const renderObjectValue = value => (isObject(value) ? '[complex value]' : `${value}`);
 
-const typeActions = [{
+const typeActions = [
+  {
     name: 'nested',
     check: arg => arg === 'nested',
     process: (render, children, acc) => render(children, acc),
@@ -28,7 +16,9 @@ const typeActions = [{
   {
     name: 'changed',
     check: arg => arg === 'changed',
-    process: (key, oldValue, newValue, acc) => `Property '${acc}${key}' was updated. From '${renderObjectValue(oldValue)}' to '${renderObjectValue(newValue)}'`,
+    process: (key, oldValue, newValue, acc) => `Property '${acc}${key}' was updated. From '${renderObjectValue(
+      oldValue,
+    )}' to '${renderObjectValue(newValue)}'`,
   },
   {
     name: 'deleted',
@@ -42,27 +32,21 @@ const typeActions = [{
   },
 ];
 
-const getTypeAction = arg => typeActions.find(({
-  check,
-}) => check(arg));
+const getTypeAction = arg => typeActions.find(({ check }) => check(arg));
 
 const render = (ast) => {
-  const iter = (astDiff, acc) => {
-    return astDiff.map((node) => {
+  const iter = (astDiff, acc) => astDiff
+    .map((node) => {
       const {
-        key,
-        oldValue,
-        newValue,
-        children,
-        type,
+        key, oldValue, newValue, children, type,
       } = node;
       const path = `${acc}${key}.`;
-      const {
-        process,
-      } = getTypeAction(type);
-      return children.length > 0 ? process(iter, children, path) : process(key, oldValue, newValue, acc);
-    }).join('\n');
-  };
+      const { process } = getTypeAction(type);
+      return children.length > 0
+        ? process(iter, children, path)
+        : process(key, oldValue, newValue, acc);
+    })
+    .join('\n');
 
   return iter(ast, '');
 };
