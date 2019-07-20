@@ -1,6 +1,6 @@
 {
   "name": "gendiff-by-evgeniy",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Study Project: GenDiff, Hexlet.io 2lvl",
   "main": "dist/index.js",
   "keywords": [
