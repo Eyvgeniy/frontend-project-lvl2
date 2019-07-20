@@ -9,6 +9,8 @@ const diff = program
   .arguments('<firstconfig> <secondconfig>')
   .option('-V, --version', 'output the version number')
   .option('-f, --format <type>', 'Output format')
-  .action((firstconfig, secondconfig) => gendiff(firstconfig, secondconfig, program.format));
+  .action((firstconfig, secondconfig) =>
+    console.log(gendiff(firstconfig, secondconfig, program.format)),
+  );
 
 diff.parse(process.argv);
