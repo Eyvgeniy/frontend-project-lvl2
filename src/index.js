@@ -1,74 +1,20 @@
-import fs from 'fs';
-import path from 'path';
 import {
   has,
   union,
   isObject,
 } from 'lodash';
 import parse from './parsers';
-
-const indent = '  ';
-
-const renderObjectValue = (value, deep) => {
-  if (isObject(value)) {
-    const values = Object.keys(value).map(el => `  ${el}: ${value[el]}`).join('\n');
-    return `{\n${indent.repeat(deep+2)}${values}\n${indent.repeat(deep+1)}}`;
-  }
-  return `${value}`;
-};
-
-const typeActions = [{
-    name: 'nested',
-    check: arg => arg === 'nested',
-    process: (key, render, children, deep) => `${indent.repeat(deep-1)}${key}: {\n${render(children, deep)}\n${indent.repeat(deep-1)}}`,
-  },
-  {
-    name: 'unchanged',
-    check: arg => arg === 'unchanged',
-    process: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}  ${key}: ${oldValue}`,
-  },
-  {
-    name: 'changed',
-    check: function (arg) {
-      return arg === 'changed';
-    },
-    process: (key, oldValue, newValue, deep) => {
-      return [
-        [`${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`],
-        [`${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`],
-      ];
-    }
-  },
-  {
-    name: 'deleted',
-    check: function (arg) {
-      return arg === 'deleted';
-    },
-    process: (key, oldValue, newValue, deep) => {
-      return `${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`;
-    }
-  },
-  {
-    name: 'added',
-    check: function (arg) {
-      return arg === 'added';
-    },
-    process: (key, oldValue, newValue, deep) => {
-      return `${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`;
-    }
-  }
-];
-const getTypeAction = arg => typeActions.find(({
-  check
-}) => check(arg));
+import json from './formatters/tree';
+import plain from './formatters/plain';
+import file from './formatters/json';
 
 const buildAst = (first, second) => {
   const keys = union(Object.keys(first), Object.keys(second));
   const ast = keys.map((key) => {
     if (
-      has(first, key) &&
-      has(second, key) &&
-      isObject(first[key]) && isObject(second[key])
+      has(first, key)
+      && has(second, key)
+      && isObject(first[key]) && isObject(second[key])
     ) {
       return {
         key,
@@ -79,9 +25,9 @@ const buildAst = (first, second) => {
       };
     }
     if (
-      has(first, key) &&
-      has(second, key) &&
-      first[key] === second[key]
+      has(first, key)
+      && has(second, key)
+      && first[key] === second[key]
     ) {
       return {
         key,
@@ -92,9 +38,9 @@ const buildAst = (first, second) => {
       };
     }
     if (
-      has(first, key) &&
-      has(second, key) &&
-      first[key] !== second[key]
+      has(first, key)
+      && has(second, key)
+      && first[key] !== second[key]
     ) {
       return {
         key,
@@ -126,29 +72,23 @@ const buildAst = (first, second) => {
   return ast;
 };
 
-const gendiff = (first, second) => {
+const gendiff = (first, second, format) => {
   const firstFile = parse(first);
   const secondFile = parse(second);
   const ast = buildAst(firstFile, secondFile);
-  const render = (astDiff, deep) => {
-    console.log(deep);
-    return astDiff.map((el) => {
-      const {
-        key,
-        oldValue,
-        newValue,
-        type,
-        children,
-      } = el;
-      const {
-        process,
-      } = getTypeAction(type);
-      return children.length > 0 ? process(key, render, children, deep + 2) : process(key, oldValue, newValue, deep);
-    }).flat().join('\n');
-  };
-  console.log(render(ast, 0));
+  switch (format) {
+    case 'plain':
+      return (plain(ast));
 
-  return `{\n${render(ast, 0)}\n}`;
+    case 'json':
+      return (json(ast));
+
+    case 'file':
+      return file(ast);
+
+    default:
+      break;
+  }
 };
 
 export default gendiff;
