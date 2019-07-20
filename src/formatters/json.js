@@ -9,7 +9,7 @@ const renderObjectValue = (value, deep) => {
       .map(el => `  "${el}": ${renderObjectValue(value[el])}`)
       .join('\n');
     return `{\n${indent.repeat(deep + 2)}${values}\n${indent.repeat(
-      deep + 1,
+      deep + 1
     )}},`;
   }
   return typeof value === 'string' ? `"${value}",` : `${value},`;
@@ -22,45 +22,37 @@ const typeActions = [
     process: (key, render, children, deep) =>
       `${indent.repeat(deep - 1)}"${key}": {\n${render(
         children,
-        deep,
-      )}\n${indent.repeat(deep - 1)}},`,
+        deep
+      )}\n${indent.repeat(deep - 1)}},`
   },
   {
     name: 'unchanged',
     check: arg => arg === 'unchanged',
     process: (key, oldValue, newValue, deep) =>
-      `${indent.repeat(deep)}"  ${key}": ${renderObjectValue(oldValue)}`,
+      `${indent.repeat(deep)}"  ${key}": ${renderObjectValue(oldValue)}`
   },
   {
     name: 'changed',
     check: arg => arg === 'changed',
     process: (key, oldValue, newValue, deep) => [
       [
-        `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(
-          oldValue,
-          deep,
-        )}`,
+        `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`
       ],
-      [
-        `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(
-          newValue,
-          deep,
-        )}`,
-      ],
-    ],
+      [`${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`]
+    ]
   },
   {
     name: 'deleted',
     check: arg => arg === 'deleted',
     process: (key, oldValue, newValue, deep) =>
-      `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`,
+      `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`
   },
   {
     name: 'added',
     check: arg => arg === 'added',
     process: (key, oldValue, newValue, deep) =>
-      `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`,
-  },
+      `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`
+  }
 ];
 const getTypeAction = arg => typeActions.find(({ check }) => check(arg));
 
