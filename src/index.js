@@ -43,15 +43,13 @@ const buildAst = (first, second) => {
         children: [],
       };
     }
-    if (!has(first, key) && has(second, key)) {
-      return {
-        key,
-        oldValue: null,
-        newValue: second[key],
-        type: 'added',
-        children: [],
-      };
-    }
+    return {
+      key,
+      oldValue: null,
+      newValue: second[key],
+      type: 'added',
+      children: [],
+    };
   });
   return ast;
 };
@@ -63,15 +61,14 @@ const gendiff = (first, second, format) => {
   switch (format) {
     case 'plain':
       return plain(ast);
-
     case 'json':
       return json(ast);
     case 'file':
       return file(ast);
-
     default:
       break;
   }
+  return null;
 };
 
 export default gendiff;
