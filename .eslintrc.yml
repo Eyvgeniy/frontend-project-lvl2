@@ -8,9 +8,10 @@ env:
   jest: true
 
 extends:
-  - 'airbnb-base'
+  - "airbnb-base"
 
 parser: babel-eslint
 
 rules:
+  code: 80
   no-console: 0
