@@ -15,33 +15,15 @@ const buildAst = (first, second) => {
       };
     }
     if (has(first, key) && has(second, key) && first[key] === second[key]) {
-      return {
-        key,
-        oldValue: first[key],
-        newValue: null,
-        type: "unchanged",
-        children: []
-      };
+      return { key, oldValue: first[key], newValue: null, type: "unchanged", children: [] };
     }
     if (has(first, key) && has(second, key) && first[key] !== second[key]) {
-      return {
-        key,
-        oldValue: first[key],
-        newValue: second[key],
-        type: "changed",
-        children: []
-      };
+      return { key, oldValue: first[key], newValue: second[key], type: "changed", children: [] };
     }
     if (has(first, key) && !has(second, key)) {
       return { key, oldValue: first[key], newValue: null, type: "deleted", children: [] };
     }
-    return {
-      key,
-      oldValue: null,
-      newValue: second[key],
-      type: "added",
-      children: []
-    };
+    return { key, oldValue: null, newValue: second[key], type: "added", children: [] };
   });
   return ast;
 };
