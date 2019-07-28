@@ -46,10 +46,10 @@ const buildAst = (first, second) => {
   return ast;
 };
 
-const gendiff = (first, second, format) => {
-  const firstFile = parse(first);
-  const secondFile = parse(second);
-  const ast = buildAst(firstFile, secondFile);
+const gendiff = (firstFile, secondFile, format) => {
+  const firstData = parse(firstFile);
+  const secondData = parse(secondFile);
+  const ast = buildAst(firstData, secondData);
   return render(ast, format);
 };
 
