@@ -13,5 +13,5 @@ extends:
 parser: babel-eslint
 
 rules:
-  code: 80
   no-console: 0
+  code: 80
