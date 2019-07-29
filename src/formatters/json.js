@@ -57,7 +57,7 @@ const diff = astDiff => {
       .map(el => {
         const { key, oldValue, newValue, type, children } = el;
         const { process } = getTypeAction(type);
-        return children.length > 0
+        return type === "nested"
           ? process(key, render, children, deep + 2)
           : process(key, oldValue, newValue, deep);
       })
