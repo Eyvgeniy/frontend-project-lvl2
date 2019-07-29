@@ -1,55 +1,50 @@
-import fs from 'fs';
-import { isObject } from 'lodash';
+import fs from "fs";
+import { isObject } from "lodash";
 
-const indent = '  ';
+const indent = "  ";
 
 const renderObjectValue = (value, deep) => {
   if (isObject(value)) {
     const values = Object.keys(value)
       .map(el => `  "${el}": ${renderObjectValue(value[el])}`)
-      .join('\n');
-    return `{\n${indent.repeat(deep + 2)}${values}\n${indent.repeat(
-      deep + 1
-    )}},`;
+      .join("\n");
+    return `{\n${indent.repeat(deep + 2)}${values}\n${indent.repeat(deep + 1)}},`;
   }
-  return typeof value === 'string' ? `"${value}",` : `${value},`;
+  return typeof value === "string" ? `"${value}",` : `${value},`;
 };
 
 const typeActions = [
   {
-    name: 'nested',
-    check: arg => arg === 'nested',
+    name: "nested",
+    check: arg => arg === "nested",
     process: (key, render, children, deep) =>
-      `${indent.repeat(deep - 1)}"${key}": {\n${render(
-        children,
-        deep
-      )}\n${indent.repeat(deep - 1)}},`
+      `${indent.repeat(deep - 1)}"${key}": {\n${render(children, deep)}\n${indent.repeat(
+        deep - 1
+      )}},`
   },
   {
-    name: 'unchanged',
-    check: arg => arg === 'unchanged',
+    name: "unchanged",
+    check: arg => arg === "unchanged",
     process: (key, oldValue, newValue, deep) =>
       `${indent.repeat(deep)}"  ${key}": ${renderObjectValue(oldValue)}`
   },
   {
-    name: 'changed',
-    check: arg => arg === 'changed',
+    name: "changed",
+    check: arg => arg === "changed",
     process: (key, oldValue, newValue, deep) => [
-      [
-        `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`
-      ],
+      [`${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`],
       [`${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`]
     ]
   },
   {
-    name: 'deleted',
-    check: arg => arg === 'deleted',
+    name: "deleted",
+    check: arg => arg === "deleted",
     process: (key, oldValue, newValue, deep) =>
       `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`
   },
   {
-    name: 'added',
-    check: arg => arg === 'added',
+    name: "added",
+    check: arg => arg === "added",
     process: (key, oldValue, newValue, deep) =>
       `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`
   }
@@ -67,7 +62,7 @@ const diff = astDiff => {
           : process(key, oldValue, newValue, deep);
       })
       .flat()
-      .join('\n');
+      .join("\n");
   return `{\n${render(astDiff, 0)}\n}`;
 };
-export default data => fs.writeFileSync('diff.json', diff(data));
+export default data => fs.writeFileSync("diff.json", diff(data));

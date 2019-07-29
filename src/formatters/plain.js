@@ -20,7 +20,7 @@ const render = ast => {
         const { key, oldValue, newValue, children, type } = node;
         const path = `${acc}${key}.`;
         const process = typeActions[type];
-        return children.length > 0
+        return type === "nested"
           ? process(iter, children, path)
           : process(key, oldValue, newValue, acc);
       })
