@@ -1,31 +1,22 @@
-import ini from 'ini';
-import yaml from 'js-yaml';
-import fs from 'fs';
-import path from 'path';
+import ini from "ini";
+import yaml from "js-yaml";
+import fs from "fs";
+import path from "path";
 
 const typeFile = [
   {
-    type: 'yaml',
-    check: arg => arg === '.yaml',
-    process: file => yaml.safeLoad(fs.readFileSync(`${file}`, 'utf8')),
+    ".yaml": filePath => yaml.safeLoad(fs.readFileSync(`${filePath}`, "utf8"))
   },
   {
-    type: 'json',
-    check: arg => arg === '.json',
-    process: file => JSON.parse(fs.readFileSync(`${file}`, 'utf8')),
+    ".json": filePath => JSON.parse(fs.readFileSync(`${filePath}`, "utf8"))
   },
   {
-    type: 'ini',
-    check: arg => arg === '.ini',
-    process: file => ini.parse(fs.readFileSync(`${file}`, 'utf-8')),
-  },
+    ".ini": filePath => ini.parse(fs.readFileSync(`${filePath}`, "utf-8"))
+  }
 ];
-export default (file) => {
-  const ext = path.extname(file);
-  const {
-    process,
-  } = typeFile.find(({
-    check,
-  }) => check(ext));
-  return process(file);
+
+export default filePath => {
+  const ext = path.extname(filePath);
+  const process = typeFile[ext];
+  return process(filePath);
 };
