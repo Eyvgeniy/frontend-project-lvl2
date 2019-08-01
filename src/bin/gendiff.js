@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import program from "commander";
-import gendiff from "../index";
+import gendiff from "..";
 
 program
   .description("Compares two configuration files and shows a difference.")
