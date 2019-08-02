@@ -9,7 +9,7 @@ env:
 
 extends:
   - 'airbnb-base'
-  - 'prettier'
+  
 
 parser: babel-eslint
 

@@ -1,11 +1,11 @@
-import renderTree from "./tree";
-import renderPlain from "./plain";
-import renderJSON from "./json";
+import renderTree from './tree';
+import renderPlain from './plain';
+import renderJSON from './json';
 
 const formats = {
   tree: renderTree,
   plain: renderPlain,
-  json: renderJSON
+  json: renderJSON,
 };
 
 export default (ast, format) => {

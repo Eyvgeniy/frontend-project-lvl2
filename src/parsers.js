@@ -6,9 +6,9 @@ import path from 'path';
 const typeFile = {
   '.yaml': filePath => yaml.safeLoad(fs.readFileSync(`${filePath}`, 'utf8')),
   '.json': filePath => JSON.parse(fs.readFileSync(`${filePath}`, 'utf8')),
-  '.ini': filePath => ini.parse(fs.readFileSync(`${filePath}`, 'utf-8'))
+  '.ini': filePath => ini.parse(fs.readFileSync(`${filePath}`, 'utf-8')),
 };
-export default filePath => {
+export default (filePath) => {
   const ext = path.extname(filePath);
   const process = typeFile[ext];
   return process(filePath);
