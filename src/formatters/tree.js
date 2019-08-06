@@ -13,26 +13,37 @@ const renderObjectValue = (value, deep) => {
 };
 
 const typeActions = {
-  nested: (key, render, children, deep) => `${indent.repeat(deep - 1)}${key}: {\n${render(children, deep)}\n${indent.repeat(deep - 1)}}`,
-  unchanged: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}  ${key}: ${oldValue}`,
-  changed: (key, oldValue, newValue, deep) => [
-    [`${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`],
-    [`${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`],
-  ],
-  deleted: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`,
-  added: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`,
+  nested: (node, deep, render) => {
+    const { key, children } = node;
+    return `${indent.repeat(deep + 1)}${key}: {\n${render(children, deep + 2)}\n${indent.repeat(deep + 1)}}`;
+  },
+  unchanged: (node, deep) => {
+    const { key, oldValue } = node;
+    return `${indent.repeat(deep)}  ${key}: ${oldValue}`;
+  },
+  changed: (node, deep) => {
+    const { key, oldValue, newValue } = node;
+    return [
+      [`${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`],
+      [`${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`],
+    ];
+  },
+  deleted: (node, deep) => {
+    const { key, oldValue } = node;
+    return `${indent.repeat(deep)}- ${key}: ${renderObjectValue(oldValue, deep)}`;
+  },
+  added: (node, deep) => {
+    const { key, newValue } = node;
+    return `${indent.repeat(deep)}+ ${key}: ${renderObjectValue(newValue, deep)}`;
+  },
 };
 
 const diff = (astDiff) => {
   const render = (ast, deep) => ast
-    .map((el) => {
-      const {
-        key, oldValue, newValue, type, children,
-      } = el;
+    .map((node) => {
+      const { type } = node;
       const process = typeActions[type];
-      return type === 'nested'
-        ? process(key, render, children, deep + 2)
-        : process(key, oldValue, newValue, deep);
+      return process(node, deep, render);
     })
     .flat()
     .join('\n');

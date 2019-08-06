@@ -4,59 +4,48 @@ import { isObject } from 'lodash';
 const indent = '  ';
 
 const renderObjectValue = (value, deep) => {
-  if (isObject(value)) {
-    const values = Object.keys(value)
-      .map(el => `  "${el}": ${renderObjectValue(value[el])}`)
-      .join('\n');
-    return `{\n${indent.repeat(deep + 2)}${values}\n${indent.repeat(deep + 1)}},`;
+  if (!isObject(value)) {
+    return typeof value === 'string' ? `"${value}",` : `${value},`;
   }
-  return typeof value === 'string' ? `"${value}",` : `${value},`;
+  const values = Object.keys(value)
+    .map(el => `  "${el}": ${renderObjectValue(value[el])}`)
+    .join('\n');
+  return `{\n${indent.repeat(deep + 2)}${values}\n${indent.repeat(deep + 1)}},`;
 };
 
-const typeActions = [
-  {
-    name: 'nested',
-    check: arg => arg === 'nested',
-    process: (key, render, children, deep) => `${indent.repeat(deep - 1)}"${key}": {\n${render(children, deep)}\n${indent.repeat(
-      deep - 1,
-    )}},`,
+const typeActions = {
+  nested: (node, deep, render) => {
+    const { key, children } = node;
+    return `${indent.repeat(deep - 1)}"${key}": {\n${render(children, deep)}\n${indent.repeat(deep - 1)}},`;
   },
-  {
-    name: 'unchanged',
-    check: arg => arg === 'unchanged',
-    process: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}"  ${key}": ${renderObjectValue(oldValue)}`,
+  unchanged: (node, deep) => {
+    const { key, oldValue } = node;
+    return `${indent.repeat(deep)}"  ${key}": ${renderObjectValue(oldValue)}`;
   },
-  {
-    name: 'changed',
-    check: arg => arg === 'changed',
-    process: (key, oldValue, newValue, deep) => [
+  changed: (node, deep) => {
+    const { key, oldValue, newValue } = node;
+    return [
       [`${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`],
       [`${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`],
-    ],
+    ];
   },
-  {
-    name: 'deleted',
-    check: arg => arg === 'deleted',
-    process: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`,
+  deleted: (node, deep) => {
+    const { key, oldValue } = node;
+    return `${indent.repeat(deep)}"- ${key}": ${renderObjectValue(oldValue, deep)}`;
   },
-  {
-    name: 'added',
-    check: arg => arg === 'added',
-    process: (key, oldValue, newValue, deep) => `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`,
+  added: (node, deep) => {
+    const { key, newValue } = node;
+    return `${indent.repeat(deep)}"+ ${key}": ${renderObjectValue(newValue, deep)}`;
   },
-];
-const getTypeAction = arg => typeActions.find(({ check }) => check(arg));
+};
+
 
 const diff = (astDiff) => {
   const render = (ast, deep) => ast
-    .map((el) => {
-      const {
-        key, oldValue, newValue, type, children,
-      } = el;
-      const { process } = getTypeAction(type);
-      return type === 'nested'
-        ? process(key, render, children, deep + 2)
-        : process(key, oldValue, newValue, deep);
+    .map((node) => {
+      const { type } = node;
+      const process = typeActions[type];
+      return process(node, deep, render);
     })
     .flat()
     .join('\n');
