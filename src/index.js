@@ -5,7 +5,7 @@ import render from './formatters/index';
 import buildAst from './gendiff';
 
 
-const gendiff = (filePath1, filePath2, format) => {
+export default (filePath1, filePath2, format) => {
   const data1 = fs.readFileSync(`${filePath1}`, 'utf8');
   const data2 = fs.readFileSync(`${filePath2}`, 'utf8');
   const ext1 = path.extname(filePath1);
