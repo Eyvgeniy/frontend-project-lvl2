@@ -1,33 +1,18 @@
-import { has, union, isObject } from 'lodash';
+import fs from 'fs';
+import path from 'path';
 import parse from './parsers';
 import render from './formatters/index';
+import buildAst from './gendiff';
 
-const buildAst = (first, second) => {
-  const keys = union(Object.keys(first), Object.keys(second));
-  const ast = keys.map((key) => {
-    if (has(first, key) && has(second, key) && isObject(first[key]) && isObject(second[key])) {
-      return { key, type: 'nested', children: buildAst(first[key], second[key]) };
-    }
-    if (has(first, key) && has(second, key) && first[key] === second[key]) {
-      return { key, oldValue: first[key], type: 'unchanged' };
-    }
-    if (has(first, key) && has(second, key) && first[key] !== second[key]) {
-      return {
-        key, oldValue: first[key], newValue: second[key], type: 'changed',
-      };
-    }
-    if (has(first, key) && !has(second, key)) {
-      return { key, oldValue: first[key], type: 'deleted' };
-    }
-    return { key, newValue: second[key], type: 'added' };
-  });
-  return ast;
-};
 
-const gendiff = (firstFilePath, secondFilePath, format) => {
-  const firstData = parse(firstFilePath);
-  const secondData = parse(secondFilePath);
-  const ast = buildAst(firstData, secondData);
+const gendiff = (filePath1, filePath2, format) => {
+  const data1 = fs.readFileSync(`${filePath1}`, 'utf8');
+  const data2 = fs.readFileSync(`${filePath2}`, 'utf8');
+  const ext1 = path.extname(filePath1);
+  const ext2 = path.extname(filePath2);
+  const parsedData1 = parse(data1, ext1);
+  const parsedData2 = parse(data2, ext2);
+  const ast = buildAst(parsedData1, parsedData2);
   return render(ast, format);
 };
 
