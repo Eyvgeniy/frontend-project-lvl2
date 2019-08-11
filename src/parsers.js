@@ -2,9 +2,9 @@ import ini from 'ini';
 import yaml from 'js-yaml';
 
 const typeFile = {
-  '.yaml': data => yaml.safeLoad(data),
-  '.json': data => JSON.parse(data),
-  '.ini': data => ini.parse(data),
+  '.yaml': yaml.safeLoad,
+  '.json': JSON.parse,
+  '.ini': ini.parse,
 };
 export default (data, ext) => {
   const process = typeFile[ext];

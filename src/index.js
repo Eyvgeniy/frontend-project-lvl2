@@ -16,4 +16,3 @@ export default (filePath1, filePath2, format) => {
   return render(ast, format);
 };
 
-export default gendiff;
