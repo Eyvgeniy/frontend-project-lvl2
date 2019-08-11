@@ -15,4 +15,3 @@ export default (filePath1, filePath2, format) => {
   const ast = buildAst(parsedData1, parsedData2);
   return render(ast, format);
 };
-
